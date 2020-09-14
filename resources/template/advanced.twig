@@ -1,0 +1,50 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title></title>
+        <style>
+            @media print {
+                section {
+                    page-break-after: always;
+                }
+            }
+
+            .qr {
+                display: block;
+                font-family: monospace;
+                white-space: pre;
+                margin: 1em 0px;
+                line-height: 100%;
+                zoom: 80%;
+                font-size: x-large;
+                letter-spacing: -1px;
+            }
+        </style>
+    </head>
+    <body>
+        <section>
+            <h1>VPN Configuration for {{ serverPeer.endpoint }}</h1>
+            <h4>Generated on {{ "now"|date("Y-m-d H:i:s") }}</h4>
+            <hr/>
+        </section>
+
+        {% for config in configs %}
+            <section>
+                {% if config.user is not empty %}
+                    <h5>User "{{ config.user }}"</h5>
+                {% else %}
+                    <h5>Peer #{{ loop.index }}</h5>
+                {% endif %}
+
+                <details>
+                    <summary>Show config</summary>
+                    <pre>{{ config.text }}</pre>
+                </details>
+
+                <pre class="qr">{{ config.qr }}</pre><br/>
+                <b>Address:</b> {{ config.clientPeer.allowedAddress|first }}<br/>
+                <hr/>
+            </section>
+        {% endfor %}
+    </body>
+</html>

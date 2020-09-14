@@ -14,7 +14,7 @@ class Configuration implements RenderableInterface
 
     public function addSection(ConfigurationSection $section): void
     {
-        $name = $section->getSectionName();
+        $name = $section::getSectionName();
         if (isset($this->sections[$name])) {
             throw new SectionAlreadyExistsException($section);
         }

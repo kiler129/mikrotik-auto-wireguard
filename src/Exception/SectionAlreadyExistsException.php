@@ -9,6 +9,6 @@ class SectionAlreadyExistsException extends \OverflowException
 {
     public function __construct(ConfigurationSection $section)
     {
-        parent::__construct(\sprintf('Section "%s" already exists', $section->getSectionName()));
+        parent::__construct(\sprintf('Section "%s" already exists', $section::getSectionName()));
     }
 }

@@ -116,24 +116,29 @@ class GenerateCommand extends Command
 
         $peers = $this->generatePeers($input, $users);
 
-        $output->write($this->renderTemplate($input->getOption('template'), $peers));
+        /** @var string $tpl */
+        $tpl = $input->getOption('template');
+        $output->write($this->renderTemplate($tpl, $peers));
 
         return self::SUCCESS;
     }
 
     private function configureClient(InputInterface $input): void
     {
-        $client = ROSClientFactory::createClient(
-            $input->getArgument('router-host'),
-            $input->getArgument('router-username'),
-            $input->getArgument('router-password')
-        );
+        /** @var string|null $host */
+        $host = $input->getArgument('router-host');
+        /** @var string|null $user */
+        $user = $input->getArgument('router-username');
+        /** @var string|null $pass */
+        $pass = $input->getArgument('router-password');
+
+        $client = ROSClientFactory::createClient((string)$user, (string)$host, (string)$pass);
 
         $this->clientProvider->setClient($client);
     }
 
     /**
-     * @return array<string>|null
+     * @return array<string|null>|null
      */
     private function createUsersList(InputInterface $input, OutputInterface $output): ?array
     {
@@ -148,8 +153,10 @@ class GenerateCommand extends Command
         }
 
         $users = [];
-        if ($hasUserList) {
-            $users = \file($input->getOption('user-list'), \FILE_IGNORE_NEW_LINES|\FILE_SKIP_EMPTY_LINES);
+        /** @var string $userListFile */
+        $userListFile = $input->getOption('user-list');
+        if ($hasUserList && $userListFile !== '') {
+            $users = \file($userListFile, \FILE_IGNORE_NEW_LINES|\FILE_SKIP_EMPTY_LINES);
             if ($users === false) {
                 $output->writeln('<error>Failed to read --user-list file</error>');
 
@@ -158,7 +165,9 @@ class GenerateCommand extends Command
         }
 
         if ($hasUsers) {
-            return \array_merge($users, $input->getOption('user'));
+            /** @var array<string> $userArg */
+            $userArg = $input->getOption('user');
+            return \array_merge($users, $userArg);
         }
 
         if (\count($users) !== 0) {
@@ -166,13 +175,28 @@ class GenerateCommand extends Command
         }
 
         //Stupid... but for it will not be 30,000 elements at once but just a couple ;)
-        return \array_fill(0, (int)$input->getOption('num'), null);
+        /** @var string|int|null $autoUsers */
+        $autoUsers = $input->getOption('num');
+        return \array_fill(0, (int)$autoUsers, null);
     }
 
     private function populateServer(InputInterface $input): void
     {
-        $host = $input->getOption('vpn-host') ?: $input->getArgument('router-host');
-        $port = (int)$input->getOption('vpn-port') ?: 443; //TODO: get from interface
+        /** @var string|null $host */
+        $host = $input->getOption('vpn-host');
+        if ($host === null || $host === '') {
+            /** @var string $host */
+            $host = $input->getArgument('router-host');
+        }
+
+        /** @var int|string|null $port */
+        $port = $input->getOption('vpn-port');
+        if ($port === null || $port === '') {
+            $port = 443; //TODO: get from interface
+        }
+        $port = (int)$port;
+
+        /** @var string|null $publicKey */
         $publicKey = $input->getOption('public-key'); //TODO: get from interface
         if ($publicKey === null || $publicKey === '') {
             throw new \Exception('MT public key needed! (use --pk option)');
@@ -183,25 +207,35 @@ class GenerateCommand extends Command
             ->setServeryKey($publicKey)
         ;
 
-        $keepAliveSeconds = (int)$input->getOption('keep-alive');
+        /** @var string|int|null $keepAliveSeconds */
+        $keepAliveSeconds = $input->getOption('keep-alive');
+        $keepAliveSeconds = (int)$keepAliveSeconds;
         if ($keepAliveSeconds > 0) {
             $this->configBuilder->setKeepAlive($keepAliveSeconds);
         }
 
-        foreach ($input->getOption('allowed') as $allowed) {
+        /** @var string[] $allowedIps */
+        $allowedIps = $input->getOption('allowed');
+        foreach ($allowedIps as $allowed) {
             $this->configBuilder->addAllowedNetwork($allowed);
         }
     }
 
     /**
-     * @param iterable<string> $users
+     * @param array<string|null> $users
      *
      * @return \SplObjectStorage<Peer, string|null>
      */
-    private function generatePeers(InputInterface $input, iterable $users): \SplObjectStorage
+    private function generatePeers(InputInterface $input, array $users): \SplObjectStorage
     {
+        /** @var string $interface */
         $interface = $input->getOption('interface');
-        $pool = $input->getOption('pool') ?: null;
+        /** @var string|null $pool */
+        $pool = $input->getOption('pool');
+        if ($pool === '') {
+            $pool = null;
+        }
+        /** @var bool $usePsk */
         $usePsk = $input->getOption('psk');
 
         //TODO: should probably add usename in comment in ROS
@@ -216,7 +250,6 @@ class GenerateCommand extends Command
     }
 
     /**
-     * @param Peer              $server
      * @param \SplObjectStorage<Peer, string|null> ...$clients
      *
      */

@@ -1,0 +1,38 @@
+includes:
+    - vendor/phpstan/phpstan-symfony/extension.neon
+    - vendor/phpstan/phpstan-deprecation-rules/rules.neon
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+
+parameters:
+    level: 7
+    tmpDir: var/cache/_phpstan
+    parallel:
+        jobSize: 20
+        maximumNumberOfProcesses: 16
+        minimumNumberOfJobsPerProcess: 2
+        processTimeout: 30.0
+
+    symfony:
+        container_xml_path: '%rootDir%/../../../var/cache/dev/NoFlash_SnmpBridge_KernelDevDebugContainer.xml'
+        console_application_loader: %rootDir%/../../../.tools/PhpStan/console-application.php
+    excludes_analyse:
+        - %rootDir%/../../../src/DependencyInjection/Configuration.php # semantic config will never work with static analysis
+
+    tipsOfTheDay: false
+    polluteScopeWithLoopInitialAssignments: false
+    polluteScopeWithAlwaysIterableForeach: false
+    polluteCatchScopeWithTryAssignments: true
+    checkAlwaysTrueCheckTypeFunctionCall: true
+    checkAlwaysTrueInstanceof: true
+    checkAlwaysTrueStrictComparison: true
+    checkExplicitMixedMissingReturn: true
+    checkFunctionNameCase: true
+    checkMissingClosureNativeReturnTypehintRule: true
+    reportMaybesInMethodSignatures: true
+    reportStaticMethodSignatures: true
+    checkTooWideReturnTypesInProtectedAndPublicMethods: true
+    treatPhpDocTypesAsCertain: false
+    checkMissingIterableValueType: false # handled by PHPCs with more granularity
+
+    ignoreErrors:
+        # yay! nothing ;)

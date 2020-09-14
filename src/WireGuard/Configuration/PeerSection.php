@@ -18,7 +18,7 @@ class PeerSection extends AbstractSection
         'presharedkey' => 'PresharedKey',
         'allowedips' => 'AllowedIPs',
         'endpoint' => 'Endpoint',
-        'persistentkeepalive' => 'PersistentKeepalive'
+        'persistentkeepalive' => 'PersistentKeepalive',
     ];
 
     public static function getSectionName(): string

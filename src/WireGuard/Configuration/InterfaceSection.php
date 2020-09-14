@@ -14,7 +14,7 @@ class InterfaceSection extends AbstractSection
     protected const VALID_FIELDS_MAP = [
         'privatekey' => 'PrivateKey',
         'address' => 'Address',
-        'dns' => 'DNS'
+        'dns' => 'DNS',
     ];
 
     public static function getSectionName(): string

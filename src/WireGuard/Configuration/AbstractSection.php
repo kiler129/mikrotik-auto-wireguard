@@ -9,6 +9,7 @@ abstract class AbstractSection implements ConfigurationSection
 {
     protected const VALID_FIELDS_MAP = [];
 
+    /** @var array<string,string> */
     private array $fields = [];
 
     public function setField(string $key, string $value): void
@@ -20,6 +21,9 @@ abstract class AbstractSection implements ConfigurationSection
         $this->fields[$key] = $value;
     }
 
+    /**
+     * @return array<string,string>
+     */
     public function getFields(): array
     {
         return $this->fields;
@@ -51,6 +55,9 @@ abstract class AbstractSection implements ConfigurationSection
         return isset(static::VALID_FIELDS_MAP[\strtolower($name)]);
     }
 
+    /**
+     * @param string|int|float $value
+     */
     public function __set(string $name, $value): void
     {
         $this->setInsensitiveField($name, (string)$value);

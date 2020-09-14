@@ -10,7 +10,7 @@ class KeyGenerator
      */
     public function generateBase64Keypair(): array
     {
-        $keypair = sodium_crypto_kx_keypair();
+        $keypair = \sodium_crypto_kx_keypair();
 
         return [
             'priv' => \base64_encode(\sodium_crypto_kx_secretkey($keypair)),

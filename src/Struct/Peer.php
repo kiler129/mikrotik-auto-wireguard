@@ -13,17 +13,22 @@ class Peer
         'presharedKey',
     ];
 
-    public string  $interface;
-    public string  $publicKey;
+    public string $interface;
+    public string $publicKey;
     public ?string $privateKey;
     public ?string $endpoint       = null;
-    public array   $allowedAddress = [];
-    public ?string $presharedKey   = null;
-    public int     $rx             = 0;
-    public int     $tx             = 0;
-    public ?string $lastHandshake  = null;
-    public ?int    $persistentKeepalive = null;
 
+    /** @var array<string> */
+    public array $allowedAddress = [];
+    public ?string $presharedKey   = null;
+    public int $rx             = 0;
+    public int $tx             = 0;
+    public ?string $lastHandshake  = null;
+    public ?int $persistentKeepalive = null;
+
+    /**
+     * @return array<string,string>
+     */
     public function asSettableArray(): array
     {
         $out = [];
@@ -33,7 +38,7 @@ class Peer
                 $val = \implode(',', $val);
             }
 
-            $out[strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $field))] = $val;
+            $out[\strtolower(\preg_replace('/(?<!^)[A-Z]/', '-$0', $field))] = $val;
         }
 
         return $out;

@@ -13,7 +13,7 @@ parameters:
         processTimeout: 30.0
 
     symfony:
-        container_xml_path: '%rootDir%/../../../var/cache/dev/NoFlash_SnmpBridge_KernelDevDebugContainer.xml'
+        #container_xml_path: '%rootDir%/../../../var/cache/dev/NoFlash_SnmpBridge_KernelDevDebugContainer.xml'
         console_application_loader: %rootDir%/../../../.tools/PhpStan/console-application.php
     excludes_analyse:
         - %rootDir%/../../../src/DependencyInjection/Configuration.php # semantic config will never work with static analysis

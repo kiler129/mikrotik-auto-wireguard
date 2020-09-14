@@ -14,13 +14,13 @@ class IpApi extends AbstractApi
      */
     public function getAddressesOnInterface(string $interface): array
     {
-        $q = (new Query('/ip/address/print'));
-        $q->where('interface', $interface);
+        $query = (new Query('/ip/address/print'));
+        $query->where('interface', $interface);
 
         //This is valid in implementation but the interface is broken...
-        $r = $this->getClient()->query($q)->read();
+        $result = $this->getClient()->query($query)->read();
         $out = [];
-        foreach(array_column($r, 'address') as $addr) {
+        foreach (\array_column($result, 'address') as $addr) {
             $out[] = $this->networkUtil->addressToNetwork($addr);
         }
 
@@ -32,19 +32,18 @@ class IpApi extends AbstractApi
      */
     public function getIpPool(string $name): array
     {
-        $q = (new Query('/ip/pool/print'));
-        $q->where('name', $name);
+        $query = (new Query('/ip/pool/print'));
+        $query->where('name', $name);
 
         //This is valid in implementation but the interface is broken...
-        $r = $this->getClient()->query($q)->read();
+        $result = $this->getClient()->query($query)->read();
         $out = [];
-        foreach(array_column($r, 'ranges') as $addrList) {
-            foreach($this->rosUtil->listToArray($addrList) as $addr) {
+        foreach (\array_column($result, 'ranges') as $addrList) {
+            foreach ($this->rosUtil->listToArray($addrList) as $addr) {
                 $out[] = Range::parse($addr);
             }
         }
 
         return $out;
     }
-
 }

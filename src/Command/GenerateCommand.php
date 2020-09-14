@@ -19,6 +19,7 @@ use Twig\Loader\ArrayLoader;
 
 class GenerateCommand extends Command
 {
+    /** {@inheritdoc} */
     protected static $defaultName = 'generate';
 
     private ClientProvider $clientProvider;
@@ -26,8 +27,12 @@ class GenerateCommand extends Command
     private QrGenerator $qrGenerator;
     private AddNewPeers $peersUC;
 
-    public function __construct(ClientProvider $clientProvider, BuildClientConfiguration $configBuilder, QrGenerator $qrGenerator, AddNewPeers $peersUC)
-    {
+    public function __construct(
+        ClientProvider $clientProvider,
+        BuildClientConfiguration $configBuilder,
+        QrGenerator $qrGenerator,
+        AddNewPeers $peersUC
+    ) {
         $this->clientProvider = $clientProvider;
         $this->configBuilder = $configBuilder;
         $this->qrGenerator = $qrGenerator;
@@ -36,26 +41,66 @@ class GenerateCommand extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
-        $this
-            ->setDescription('Generates VPN peers configurations')
-            ->addOption('template', 't', InputOption::VALUE_REQUIRED, 'Output template', \realpath(__DIR__ . '/../../resources/template/advanced.twig'))
-            ->addOption('num', '#', InputOption::VALUE_REQUIRED, 'Number of peers to create', 1)
-            ->addOption('user-list', 'l', InputOption::VALUE_REQUIRED, 'File with list of users. Cannot combine with --num')
-            ->addOption('user', 'u', InputOption::VALUE_REQUIRED|InputOption::VALUE_IS_ARRAY, 'Add username(s). Cannot combine with --num')
-            ->addOption('psk', 's', InputOption::VALUE_NONE, 'Whether to use additional PSKs for peers')
-            ->addOption('allowed', 'a', InputOption::VALUE_REQUIRED|InputOption::VALUE_IS_ARRAY, 'Network(s) which should be router through VPN', ['0.0.0.0/0', '::/0'])
-            ->addOption('keep-alive', 'k', InputOption::VALUE_REQUIRED, 'Keep-alive in seconds')
-            ->addOption('interface', 'i', InputOption::VALUE_REQUIRED, 'WireGuard interface name', 'wireguard1')
-            ->addOption('pool', 'o', InputOption::VALUE_REQUIRED, 'IP > Pool to get addresses from. If not set it will use addresses on the interface')
-            ->addOption('vpn-host', null, InputOption::VALUE_REQUIRED, 'Externally-accessible VPN gateway host/IP (default: router-host)')
-            ->addOption('vpn-port', null, InputOption::VALUE_REQUIRED, 'Externally-accessible VPN gateway port (default: read from interface)')
-            ->addOption('public-key', null, InputOption::VALUE_REQUIRED, 'Public key to use (default: read from interface)')
-
-            ->addArgument('router-host', InputArgument::REQUIRED, 'Host/IP of a MikroTik router')
-            ->addArgument('router-username', InputArgument::REQUIRED, 'Username for a MikroTik router')
-            ->addArgument('router-password', InputArgument::REQUIRED, 'Password for a MikroTik router')
+        $this->setDescription('Generates VPN peers configurations')
+             ->addOption(
+                 'template',
+                 't',
+                 InputOption::VALUE_REQUIRED,
+                 'Output template',
+                 \realpath(__DIR__ . '/../../resources/template/advanced.twig')
+             )
+             ->addOption('num', '#', InputOption::VALUE_REQUIRED, 'Number of peers to create', 1)
+             ->addOption(
+                 'user-list',
+                 'l',
+                 InputOption::VALUE_REQUIRED,
+                 'File with list of users. Cannot combine with --num'
+             )
+             ->addOption(
+                 'user',
+                 'u',
+                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                 'Add username(s). Cannot combine with --num'
+             )
+             ->addOption('psk', 's', InputOption::VALUE_NONE, 'Whether to use additional PSKs for peers')
+             ->addOption(
+                 'allowed',
+                 'a',
+                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                 'Network(s) which should be router through VPN',
+                 ['0.0.0.0/0', '::/0']
+             )
+             ->addOption('keep-alive', 'k', InputOption::VALUE_REQUIRED, 'Keep-alive in seconds')
+             ->addOption('interface', 'i', InputOption::VALUE_REQUIRED, 'WireGuard interface name', 'wireguard1')
+             ->addOption(
+                 'pool',
+                 'o',
+                 InputOption::VALUE_REQUIRED,
+                 'IP > Pool to get addresses from. If not set it will use addresses on the interface'
+             )
+             ->addOption(
+                 'vpn-host',
+                 null,
+                 InputOption::VALUE_REQUIRED,
+                 'Externally-accessible VPN gateway host/IP (default: router-host)'
+             )
+             ->addOption(
+                 'vpn-port',
+                 null,
+                 InputOption::VALUE_REQUIRED,
+                 'Externally-accessible VPN gateway port (default: read from interface)'
+             )
+             ->addOption(
+                 'public-key',
+                 null,
+                 InputOption::VALUE_REQUIRED,
+                 'Public key to use (default: read from interface)'
+             )
+             ->addArgument('router-host', InputArgument::REQUIRED, 'Host/IP of a MikroTik router')
+             ->addArgument('router-username', InputArgument::REQUIRED, 'Username for a MikroTik router')
+             ->addArgument('router-password', InputArgument::REQUIRED, 'Password for a MikroTik router')
         ;
     }
 
@@ -71,7 +116,7 @@ class GenerateCommand extends Command
 
         $peers = $this->generatePeers($input, $users);
 
-        echo $this->renderTemplate($input->getOption('template'), $peers);
+        $output->write($this->renderTemplate($input->getOption('template'), $peers));
 
         return self::SUCCESS;
     }
@@ -87,6 +132,9 @@ class GenerateCommand extends Command
         $this->clientProvider->setClient($client);
     }
 
+    /**
+     * @return array<string>|null
+     */
     private function createUsersList(InputInterface $input, OutputInterface $output): ?array
     {
         $hasNum = $input->hasParameterOption(['--num', '-#']);
@@ -113,7 +161,7 @@ class GenerateCommand extends Command
             return \array_merge($users, $input->getOption('user'));
         }
 
-        if (!empty($users)) {
+        if (\count($users) !== 0) {
             return $users;
         }
 
@@ -126,7 +174,7 @@ class GenerateCommand extends Command
         $host = $input->getOption('vpn-host') ?: $input->getArgument('router-host');
         $port = (int)$input->getOption('vpn-port') ?: 443; //TODO: get from interface
         $publicKey = $input->getOption('public-key'); //TODO: get from interface
-        if (empty($publicKey)) {
+        if ($publicKey === null || $publicKey === '') {
             throw new \Exception('MT public key needed! (use --pk option)');
         }
 
@@ -135,9 +183,9 @@ class GenerateCommand extends Command
             ->setServeryKey($publicKey)
         ;
 
-        $ka = (int)$input->getOption('keep-alive');
-        if ($ka > 0) {
-            $this->configBuilder->setKeepAlive($ka);
+        $keepAliveSeconds = (int)$input->getOption('keep-alive');
+        if ($keepAliveSeconds > 0) {
+            $this->configBuilder->setKeepAlive($keepAliveSeconds);
         }
 
         foreach ($input->getOption('allowed') as $allowed) {
@@ -146,9 +194,11 @@ class GenerateCommand extends Command
     }
 
     /**
+     * @param iterable<string> $users
+     *
      * @return \SplObjectStorage<Peer, string|null>
      */
-    private function generatePeers(InputInterface $input, array $users): \SplObjectStorage
+    private function generatePeers(InputInterface $input, iterable $users): \SplObjectStorage
     {
         $interface = $input->getOption('interface');
         $pool = $input->getOption('pool') ?: null;
@@ -166,11 +216,9 @@ class GenerateCommand extends Command
     }
 
     /**
-     * @param string            $templateFile
      * @param Peer              $server
      * @param \SplObjectStorage<Peer, string|null> ...$clients
      *
-     * @return string
      */
     private function renderTemplate(string $templateFile, \SplObjectStorage $clients): string
     {
@@ -181,13 +229,13 @@ class GenerateCommand extends Command
                 'user' => $clients->getInfo(),
                 'clientPeer' => $clientPeer,
                 'qr' => $this->qrGenerator->generateConfiguration($config),
-                'text' => $config->render()
+                'text' => $config->render(),
             ];
         }
 
         $varsStack = [
             'serverPeer' => $this->configBuilder->getServerPeer(),
-            'configs' => $configs
+            'configs' => $configs,
         ];
         $loader = new ArrayLoader(['template' => \file_get_contents($templateFile),]);
         $twig = new Environment($loader);

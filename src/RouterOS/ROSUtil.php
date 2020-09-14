@@ -8,11 +8,11 @@ class ROSUtil
     /**
      * @return array<string>
      */
-    function listToArray(string $rosList): array
+    public function listToArray(string $rosList): array
     {
         $out = [];
-        foreach(\explode(',', $rosList) as $item) {
-            $out[] = trim($item);
+        foreach (\explode(',', $rosList) as $item) {
+            $out[] = \trim($item);
         }
         return $out;
     }

@@ -16,8 +16,12 @@ class AddNewPeers
     private NetworkUtil $networkUtil;
     private KeyGenerator $keyGenerator;
 
-    public function __construct(IpApi $rosIpApi, WireGuardApi $rosWGApi, NetworkUtil $networkUtil, KeyGenerator $keyGenerator)
-    {
+    public function __construct(
+        IpApi $rosIpApi,
+        WireGuardApi $rosWGApi,
+        NetworkUtil $networkUtil,
+        KeyGenerator $keyGenerator
+    ) {
         $this->rosIpApi = $rosIpApi;
         $this->rosWGApi = $rosWGApi;
         $this->networkUtil = $networkUtil;
@@ -27,8 +31,12 @@ class AddNewPeers
     /**
      * @return array<Peer>
      */
-    public function addWithConsecutiveIPs(string $interface, ?string $usePool = null, ?bool $usePsk = false, int $howMany = 1): array
-    {
+    public function addWithConsecutiveIPs(
+        string $interface,
+        ?string $usePool = null,
+        ?bool $usePsk = false,
+        int $howMany = 1
+    ): array {
         //First get addresses
         $availableIps = $usePool === null
             ? $this->rosIpApi->getAddressesOnInterface($interface) : $this->rosIpApi->getIpPool($usePool);
@@ -54,5 +62,4 @@ class AddNewPeers
 
         return $newPeers;
     }
-
 }

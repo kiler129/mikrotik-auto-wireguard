@@ -5,5 +5,4 @@ namespace NoFlash\ROSAutoWireGuard\Exception;
 
 class LogicException extends \LogicException
 {
-
 }

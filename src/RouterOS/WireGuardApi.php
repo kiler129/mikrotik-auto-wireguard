@@ -11,46 +11,51 @@ class WireGuardApi extends AbstractApi
 {
     public function addPeer(Peer $peer): void
     {
-        $q = (new Query('/interface/wireguard/peers/add'));
+        $query = (new Query('/interface/wireguard/peers/add'));
         foreach ($peer->asSettableArray() as $k => $v) {
-            $q->equal($k, $v);
+            $query->equal($k, $v);
         }
 
         //Will return ['after' => ['ret' => 'ROS ID']] on success
         //Will return ['after' => ['message' => 'error']] on failure
-        $r = $this->getClient()->query($q)->read(); //This is valid in implementation but the interface is broken...
+        //FYI: While phpStorm complains this is valid in implementation but the interface is broken...
+        $result = $this->getClient()->query($query)->read();
 
-        if (isset($r['after']['ret'])) {
+        if (isset($result['after']['ret'])) {
             return;
         }
 
-        if (isset($r['after']['message'])) {
-            throw new ROSException('RouterOS error while adding peer: ' . $r['after']['message']);
+        if (isset($result['after']['message'])) {
+            throw new ROSException('RouterOS error while adding peer: ' . $result['after']['message']);
         }
 
-        throw new ROSException('Unexpected RouterOS response while adding peer: ' . print_r($r, true));
+        throw new ROSException('Unexpected RouterOS response while adding peer: ' . \print_r($result, true));
     }
 
+    /**
+     * @return array<Peer>
+     */
     public function getPeers(?string $interface = null): array
     {
-        $q = (new Query('/interface/wireguard/peers/print'));
+        $query = (new Query('/interface/wireguard/peers/print'));
         if ($interface !== null) {
-            $q->where('interface', $interface);
+            $query->where('interface', $interface);
         }
 
-        $r = $this->getClient()->query($q)->read(); //This is valid in implementation but the interface is broken...
+        //FYI: While phpStorm complains this is valid in implementation but the interface is broken...
+        $result = $this->getClient()->query($query)->read();
         $out = [];
-        foreach($r as $apiPeer) {
+        foreach ($result as $apiPeer) {
             $out[] = $peer = new Peer();
             $peer->interface = $apiPeer['interface'];
             $peer->publicKey = $apiPeer['public-key'];
-            $peer->endpoint = ($apiPeer['endpoint'] ?? null) ?: null;
+            $peer->endpoint = $apiPeer['endpoint'] ?? null ?: null;
             $peer->allowedAddress = $this->rosUtil->listToArray($apiPeer['allowed-address'] ?? '') ?: null;
-            $peer->presharedKey = ($apiPeer['preshared-key'] ?? null) ?: null;
+            $peer->presharedKey = $apiPeer['preshared-key'] ?? null ?: null;
             $peer->rx = (int)($apiPeer['rx'] ?? 0);
             $peer->tx = (int)($apiPeer['tx'] ?? 0);
-            $peer->lastHandshake = ($apiPeer['last-handshake'] ?? null) ?: null;
-            $peer->persistentKeepalive = ((int)($apiPeer['persistent-keepalive'] ?? null)) ?: null;
+            $peer->lastHandshake = $apiPeer['last-handshake'] ?? null ?: null;
+            $peer->persistentKeepalive = (int)($apiPeer['persistent-keepalive'] ?? null) ?: null;
         }
 
         return $out;

@@ -16,6 +16,8 @@ class NetworkUtil
      * @param array<Range> $usedRanges
      *
      * @return array<IP>
+     *
+     * phpcs:disable ObjectCalisthenics.Metrics.MaxNestingLevel
      */
     public function findNextAddresses(array $available, array $usedRanges, int $howMany = 1): array
     {
@@ -54,14 +56,14 @@ class NetworkUtil
     public function networkToRange(Network ...$networks): array
     {
         $out = [];
-        foreach($networks as $network) {
+        foreach ($networks as $network) {
             $out[] = $network->getHosts();
         }
 
         return $out;
     }
 
-    function addressToNetwork(string $address): Network
+    public function addressToNetwork(string $address): Network
     {
         if (\strpos($address, '/') === false) {
             $address .= '/32'; //Single address
@@ -73,7 +75,7 @@ class NetworkUtil
     /**
      * @return array<Range>
      */
-    function getUsedPeersAddresses(Peer ...$peers): array
+    public function getUsedPeersAddresses(Peer ...$peers): array
     {
         $out = [];
         foreach ($peers as $peer) {
@@ -84,5 +86,4 @@ class NetworkUtil
 
         return $out;
     }
-
 }

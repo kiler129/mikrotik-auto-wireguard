@@ -13,9 +13,7 @@ class BuildClientConfiguration
 {
     private Peer $serverPeer;
     private PeerProjector $peerProjector;
-    /**
-     * @var NetworkUtil
-     */
+
     private NetworkUtil $networkUtil;
 
     public function __construct(PeerProjector $peerProjector, NetworkUtil $networkUtil)

@@ -28,10 +28,11 @@ class PeerProjector
         }
         $section->privateKey = $client->privateKey;
 
-        if (empty($client->allowedAddress)) {
+        if (\count($client->allowedAddress) === 0) {
             throw new MissingValueException('Unable to generate configuration: "client" peer has no address');
         }
-        $section->address = $client->allowedAddress[\array_key_first($client->allowedAddress)]; //TODO: what if there's many?
+        $section->address = $client->allowedAddress[\array_key_first($client->allowedAddress)];
+        //TODO: what if there's many?
 
         return $section;
     }
@@ -40,7 +41,7 @@ class PeerProjector
     {
         $section = new PeerSection();
 
-        if (empty($this->server->publicKey)) {
+        if (!isset($this->server->publicKey) || $this->server->publicKey === '') {
             throw new MissingValueException('Unable to generate configuration: "server" peer has no public key');
         }
         $section->publicKey = $this->server->publicKey;
@@ -50,7 +51,7 @@ class PeerProjector
         }
 
         //Hint: you probably wanted [0.0.0.0/0, ::/0] to send all traffic via tunnel
-        if (empty($this->server->allowedAddress)) {
+        if (\count($this->server->allowedAddress) === 0) {
             throw new MissingValueException('Unable to generate configuration: "server" does not have any allowed IPs');
         }
         $section->allowedIPs = \implode(', ', $this->server->allowedAddress);

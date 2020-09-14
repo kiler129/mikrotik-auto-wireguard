@@ -5,5 +5,4 @@ namespace NoFlash\ROSAutoWireGuard\Exception;
 
 class UnderflowException extends \UnderflowException
 {
-
 }

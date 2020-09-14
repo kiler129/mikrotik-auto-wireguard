@@ -52,7 +52,6 @@
     </rule>
 
     <rule ref="Generic.Metrics.NestingLevel" />
-    <rule ref="Generic.Metrics.NestingLevel" />
 
 
     <!-- ############################################################################ -->
@@ -75,7 +74,7 @@
               e,t - common in catch for $e(xception) or $t(hrowable)
               _ - common convention to mark variable as not used in loops (e.g. foreach ($foo as $key => $_))
             -->
-            <property name="allowedShortNames" type="array" value="i,id,to,k,v,e,t,_"/>
+            <property name="allowedShortNames" type="array" value="i,id,to,k,v,e,t,_,ip,rx,tx"/>
         </properties>
     </rule>
     <rule ref="ObjectCalisthenics.Files.ClassTraitAndInterfaceLength">

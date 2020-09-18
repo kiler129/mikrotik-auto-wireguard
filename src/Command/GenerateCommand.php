@@ -132,7 +132,7 @@ class GenerateCommand extends Command
         /** @var string|null $pass */
         $pass = $input->getArgument('router-password');
 
-        $client = ROSClientFactory::createClient((string)$user, (string)$host, (string)$pass);
+        $client = ROSClientFactory::createClient((string)$host, (string)$user, (string)$pass);
 
         $this->clientProvider->setClient($client);
     }

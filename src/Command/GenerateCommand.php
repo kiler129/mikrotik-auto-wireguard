@@ -5,7 +5,9 @@ namespace NoFlash\ROSAutoWireGuard\Command;
 
 use NoFlash\ROSAutoWireGuard\Factory\ROSClientFactory;
 use NoFlash\ROSAutoWireGuard\RouterOS\ClientProvider;
+use NoFlash\ROSAutoWireGuard\RouterOS\WireGuardApi;
 use NoFlash\ROSAutoWireGuard\Struct\Peer;
+use NoFlash\ROSAutoWireGuard\Struct\WireguardInterface;
 use NoFlash\ROSAutoWireGuard\UseCase\AddNewPeers;
 use NoFlash\ROSAutoWireGuard\UseCase\BuildClientConfiguration;
 use NoFlash\ROSAutoWireGuard\WireGuard\QrGenerator;
@@ -26,12 +28,16 @@ class GenerateCommand extends Command
     private BuildClientConfiguration $configBuilder;
     private QrGenerator $qrGenerator;
     private AddNewPeers $peersUC;
+    private WireGuardApi $wgApi;
+    
+    private WireguardInterface $wgInterface;
 
     public function __construct(
         ClientProvider $clientProvider,
         BuildClientConfiguration $configBuilder,
         QrGenerator $qrGenerator,
-        AddNewPeers $peersUC
+        AddNewPeers $peersUC,
+        WireGuardApi $wgApi
     ) {
         $this->clientProvider = $clientProvider;
         $this->configBuilder = $configBuilder;
@@ -39,6 +45,7 @@ class GenerateCommand extends Command
         $this->peersUC = $peersUC;
 
         parent::__construct();
+        $this->wgApi = $wgApi;
     }
 
     protected function configure(): void
@@ -192,14 +199,14 @@ class GenerateCommand extends Command
         /** @var int|string|null $port */
         $port = $input->getOption('vpn-port');
         if ($port === null || $port === '') {
-            $port = 443; //TODO: get from interface
+            $port = $this->getWGInterface($input)->listenPort;
         }
         $port = (int)$port;
 
         /** @var string|null $publicKey */
         $publicKey = $input->getOption('public-key'); //TODO: get from interface
         if ($publicKey === null || $publicKey === '') {
-            throw new \Exception('MT public key needed! (use --pk option)');
+            $publicKey = $this->getWGInterface($input)->publicKey;
         }
 
         $this->configBuilder
@@ -274,5 +281,16 @@ class GenerateCommand extends Command
         $twig = new Environment($loader);
 
         return $twig->render('template', $varsStack);
+    }
+
+    private function getWGInterface(InputInterface $input): WireguardInterface
+    {
+        if (!isset($this->wgInterface)) {
+            /** @var string $interface */
+            $interface = $input->getOption('interface');
+            $this->wgInterface = $this->wgApi->getInterface($interface);
+        }
+
+        return $this->wgInterface;
     }
 }

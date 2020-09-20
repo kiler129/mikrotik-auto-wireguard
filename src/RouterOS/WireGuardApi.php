@@ -5,6 +5,7 @@ namespace NoFlash\ROSAutoWireGuard\RouterOS;
 
 use NoFlash\ROSAutoWireGuard\Exception\ROSException;
 use NoFlash\ROSAutoWireGuard\Struct\Peer;
+use NoFlash\ROSAutoWireGuard\Struct\WireguardInterface;
 use RouterOS\Query;
 
 class WireGuardApi extends AbstractApi
@@ -59,5 +60,29 @@ class WireGuardApi extends AbstractApi
         }
 
         return $out;
+    }
+
+    public function getInterface(string $interface): WireguardInterface
+    {
+        $query = (new Query('/interface/wireguard/print'));
+        $query->where('name', $interface);
+
+        //FYI: While phpStorm complains this is valid in implementation but the interface is broken...
+        $result = $this->getClient()->query($query)->read();
+        if (\count($result) < 1) {
+            throw new ROSException(\sprintf('There is no wireguard interface named "%s"', $interface));
+        }
+
+        $apiInterface = $result[\array_key_first($result)];
+        $wgInterface = new WireguardInterface(
+            $apiInterface['name'],
+            (int)($apiInterface['mtu'] ?? 0),
+            (int)($apiInterface['listen-port'] ?? 0),
+        );
+
+        $wgInterface->privateKey = $apiInterface['private-key'];
+        $wgInterface->publicKey = $apiInterface['public-key'];
+
+        return $wgInterface;
     }
 }

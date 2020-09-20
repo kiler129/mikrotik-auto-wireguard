@@ -3,9 +3,11 @@ declare(strict_types=1);
 
 namespace NoFlash\ROSAutoWireGuard\Struct;
 
-class Peer
+final class Peer
 {
-    private const API_SETTABLE = [
+    use ROSStructHelperTrait;
+
+    protected const API_SETTABLE = [
         'interface',
         'publicKey',
         'endpoint',
@@ -26,21 +28,9 @@ class Peer
     public ?string $lastHandshake  = null;
     public ?int $persistentKeepalive = null;
 
-    /**
-     * @return array<string,string>
-     */
-    public function asSettableArray(): array
+
+    protected static function getApiSettableFields(): array
     {
-        $out = [];
-        foreach (self::API_SETTABLE as $field) {
-            $val = $this->$field ?: '';
-            if (\is_array($val)) {
-                $val = \implode(',', $val);
-            }
-
-            $out[\strtolower(\preg_replace('/(?<!^)[A-Z]/', '-$0', $field))] = $val;
-        }
-
-        return $out;
+        return self::API_SETTABLE;
     }
 }

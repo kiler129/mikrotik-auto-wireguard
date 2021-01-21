@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace NoFlash\ROSAutoWireGuard\UseCase;
 
+use IPTools\Range;
 use NoFlash\ROSAutoWireGuard\Exception\InvalidArgumentException;
 use NoFlash\ROSAutoWireGuard\NetworkUtil;
 use NoFlash\ROSAutoWireGuard\RouterOS\IpApi;
@@ -45,6 +46,11 @@ class AddNewPeers
         $availableIps = $usePool === null
             ? $this->rosIpApi->getAddressesOnInterface($interface) : $this->rosIpApi->getIpPool($usePool);
         $usedIps = $this->networkUtil->getUsedPeersAddresses(...$this->rosWGApi->getPeers($interface));
+
+        foreach ($availableIps as $availableIp) { //Assigning subnet address (e.g. 10.0.0.0) will cause WG to not work
+            $net = $availableIp->getNetwork();
+            $usedIps[] = new Range($net, $net); //For some reason doing $availableIps->exclude() doesn't work
+        }
         $newIps = $this->networkUtil->findNextAddresses($availableIps, $usedIps, $howMany);
 
         if ($comments !== null) {

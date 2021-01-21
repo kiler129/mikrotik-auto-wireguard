@@ -1,8 +1,8 @@
 {
     "require": {
-        "php": "^7.4",
+        "php": "^7.4|^8.0",
         "ext-sodium": "*",
-        "evilfreelancer/routeros-api-php": "^1.3",
+        "evilfreelancer/routeros-api-php": "dev-support-php8",
         "endroid/qr-code": "^3.9",
         "symfony/console": "^5.1",
         "s1lentium/iptools": "^1.1",
@@ -20,7 +20,7 @@
         "phpstan/phpstan-strict-rules": "^0.12.5",
         "phpstan/phpstan-symfony": "^0.12.7",
         "slevomat/coding-standard": "^6.4",
-        "sllh/composer-versions-check": "^2.0",
+        "sllh/composer-versions-check": "dev-php-8",
         "squizlabs/php_codesniffer": "^3.5"
     },
     "autoload": {
@@ -40,5 +40,11 @@
             "@composer validate --strict",
             "bin/console lint:yaml config/"
         ]
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/kiler129/routeros-api-php"
+        }
+    ]
 }

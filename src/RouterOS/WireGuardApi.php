@@ -50,7 +50,8 @@ class WireGuardApi extends AbstractApi
             $out[] = $peer = new Peer();
             $peer->interface = $apiPeer['interface'];
             $peer->publicKey = $apiPeer['public-key'];
-            $peer->endpoint = ($apiPeer['endpoint'] ?? null) ?: null;
+            $peer->endpointAddress = ($apiPeer['endpoint-address'] ?? null) ?: null;
+            $peer->endpointPort = ($apiPeer['endpoint-port'] ?? null) ?: null;
             $peer->allowedAddress = $this->rosUtil->listToArray($apiPeer['allowed-address'] ?? '') ?: null;
             $peer->presharedKey = ($apiPeer['preshared-key'] ?? null) ?: null;
             $peer->rx = (int)($apiPeer['rx'] ?? 0);

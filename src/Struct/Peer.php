@@ -10,7 +10,8 @@ final class Peer
     protected const API_SETTABLE = [
         'interface',
         'publicKey',
-        'endpoint',
+        'endpointAddress',
+        'endpointPort',
         'allowedAddress',
         'presharedKey',
     ];
@@ -18,7 +19,8 @@ final class Peer
     public string $interface;
     public string $publicKey;
     public ?string $privateKey;
-    public ?string $endpoint       = null;
+    public ?string $endpointAddress = null;
+    public ?int $endpointPort = null;
 
     /** @var array<string> */
     public array $allowedAddress = [];

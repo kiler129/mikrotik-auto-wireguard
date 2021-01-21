@@ -56,10 +56,13 @@ class PeerProjector
         }
         $section->allowedIPs = \implode(', ', $this->server->allowedAddress);
 
-        if (!isset($this->server->endpoint)) {
+        if (!isset($this->server->endpointAddress)) {
             throw new MissingValueException('Unable to generate configuration: "server" has no endpoint address');
         }
-        $section->endpoint = $this->server->endpoint;
+        if (!isset($this->server->endpointPort)) {
+            throw new MissingValueException('Unable to generate configuration: "server" has no endpoint port');
+        }
+        $section->endpoint = \sprintf('%s:%d', $this->server->endpointAddress, $this->server->endpointPort);
 
         if (isset($this->server->persistentKeepalive)) {
             $section->persistentKeepalive = $this->server->persistentKeepalive;

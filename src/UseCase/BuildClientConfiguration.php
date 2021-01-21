@@ -30,7 +30,8 @@ class BuildClientConfiguration
             $host = \sprintf('[%s]', $host);
         }
 
-        $this->serverPeer->endpoint = \sprintf('%s:%d', $host, $port);
+        $this->serverPeer->endpointAddress = $host;
+        $this->serverPeer->endpointPort = $port;
 
         return $this;
     }

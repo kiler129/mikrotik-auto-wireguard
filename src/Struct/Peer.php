@@ -14,6 +14,7 @@ final class Peer
         'endpointPort',
         'allowedAddress',
         'presharedKey',
+        'comment',
     ];
 
     public string $interface;
@@ -21,6 +22,7 @@ final class Peer
     public ?string $privateKey;
     public ?string $endpointAddress = null;
     public ?int $endpointPort = null;
+    public ?string $comment = null;
 
     /** @var array<string> */
     public array $allowedAddress = [];

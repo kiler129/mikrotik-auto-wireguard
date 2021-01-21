@@ -245,12 +245,19 @@ class GenerateCommand extends Command
         /** @var bool $usePsk */
         $usePsk = $input->getOption('psk');
 
-        //TODO: should probably add usename in comment in ROS
-        $peers = $this->peersUC->addWithConsecutiveIPs($interface, $pool, $usePsk, \count($users));
+        $comments = [];
+        foreach ($users as $username) {
+            $comments[] = ($username === null) ? null : \sprintf('User: %s', $username);
+        }
+        $peers = $this->peersUC->addWithConsecutiveIPs($interface, $pool, $usePsk, \count($users), $comments);
         $out = new \SplObjectStorage();
         $i = 0;
         foreach ($users as $user) {
-            $out->attach($peers[$i++], $user);
+            $peer = $peers[$i++];
+            if ($user !== null) {
+                $peer->comment = 'User: ' . $user;
+            }
+            $out->attach($peer, $user);
         }
 
         return $out;

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace NoFlash\ROSAutoWireGuard\UseCase;
 
+use NoFlash\ROSAutoWireGuard\Exception\InvalidArgumentException;
 use NoFlash\ROSAutoWireGuard\NetworkUtil;
 use NoFlash\ROSAutoWireGuard\RouterOS\IpApi;
 use NoFlash\ROSAutoWireGuard\RouterOS\WireGuardApi;
@@ -29,19 +30,36 @@ class AddNewPeers
     }
 
     /**
+     * @param array<string> $comments
+     *
      * @return array<Peer>
      */
     public function addWithConsecutiveIPs(
         string $interface,
         ?string $usePool = null,
         ?bool $usePsk = false,
-        int $howMany = 1
+        int $howMany = 1,
+        ?array $comments = null
     ): array {
         //First get addresses
         $availableIps = $usePool === null
             ? $this->rosIpApi->getAddressesOnInterface($interface) : $this->rosIpApi->getIpPool($usePool);
         $usedIps = $this->networkUtil->getUsedPeersAddresses(...$this->rosWGApi->getPeers($interface));
         $newIps = $this->networkUtil->findNextAddresses($availableIps, $usedIps, $howMany);
+
+        if ($comments !== null) {
+            \reset($comments);
+
+            if (\count($comments) !== $howMany) {
+                throw new InvalidArgumentException(
+                    \sprintf(
+                        'Comments array (when present) must be the same length (now %d) as $howMany (now %d) specifies',
+                        \count($comments),
+                        $howMany
+                    )
+                );
+            }
+        }
 
         //Create new peers
         $newPeers = [];
@@ -54,6 +72,11 @@ class AddNewPeers
             ['pub' => $peer->publicKey, 'priv' => $peer->privateKey] = $this->keyGenerator->generateBase64Keypair();
             if ($usePsk) {
                 $peer->presharedKey = $this->keyGenerator->generateBase64Psk();
+            }
+
+            if ($comments !== null) {
+                $peer->comment = \current($comments);
+                next($comments);
             }
 
             $this->rosWGApi->addPeer($peer); //Will throw on error

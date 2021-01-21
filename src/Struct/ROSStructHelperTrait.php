@@ -12,7 +12,11 @@ trait ROSStructHelperTrait
     {
         $out = [];
         foreach (static::getApiSettableFields() as $field) {
-            $val = $this->$field ?: '';
+            if ($this->$field === null) {
+                continue;
+            }
+
+            $val = $this->$field;
             if (\is_array($val)) {
                 $val = \implode(',', $val);
             }

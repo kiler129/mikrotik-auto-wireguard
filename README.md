@@ -30,7 +30,7 @@ This tool does all that automatically for one or more users at once.
 As of now, as the ROS is in beta stage, there are **no promises** of compatibility. In simple terms you should execute
 `bin/console generate --help` and configure it as you wish ;)
 
-For more see [more detailed docs](docs/README.md).
+For more see [more detailed docs](docs/).
 
 ## Disclaimer
 This is a beta software. As with ROSv7 it's not recommended being used in production. This software nor the author are

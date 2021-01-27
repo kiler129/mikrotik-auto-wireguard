@@ -1,4 +1,4 @@
-# MikroTik WG Auto
+# MikroTik Auto WireGuard
 
 TL;DR: this tool lets you autoconfigure WireGuard clients on a MikroTik RouterOS and generate configs for them without 
 hand-assigning any parameters.

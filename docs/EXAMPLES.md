@@ -2,9 +2,10 @@
 
 #### Get help
 `bin/console generate --help`
+
 ...no, seriously, each option has help ;)
 
-By default the following options are assumed (and can be changed):
+By default, the following options are assumed (and can be changed):
 - Advanced/HTML template (with QR code readable in CLI and in a browser)
 - Single user is generated
 - Peer config routes all traffic via VPN (use `--allowed` to change)
@@ -30,6 +31,8 @@ The generated config for the user will route all traffic through the VPN by defa
 Generate 10 users without names:
 
 `bin/console generate --num 10 router.lan user password`
+
+---
 
 #### Multiple named users
 Generate 3 users (foo, bar, baz). The example shows both long (`--user`) and short (`-u`) invocation which are

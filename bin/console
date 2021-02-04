@@ -9,7 +9,7 @@ use NoFlash\ROSAutoWireGuard\ContainerProvider;
 use Symfony\Component\Console\Application;
 
 $container = ContainerProvider::getAppContainer();
-$application = new Application();
+$application = new Application('MikroTik Auto WireGuard', 'v0.2');
 $application->addCommands([$container->get(GenerateCommand::class)]);
 
 $application->run();

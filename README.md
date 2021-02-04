@@ -21,12 +21,22 @@ This is why normally to get a new node/person connection you have to:
 
 This tool does all that automatically for one or more users at once.
 
-## Requirements
+## How to use it?
+
+### Docker
+The simplest way is through Docker:
+
+- Build image: `docker build -t mt-wg-auto https://github.com/kiler129/mikrotik-auto-wireguard.git`
+- Run: `docker run -it --rm mt-wg-auto generate --help`
+
+For more see [more detailed docs](docs/).
+
+### Without Docker
+#### Requirements
 - RouterOS v7.1 [beta3 or newer](https://github.com/kiler129/mikrotik-auto-wireguard/issues/2)
 - Admin user on the router with API enabled  
 - PHP 7.4 or newer
 
-## How to use it?
 As of now, as the ROS is in beta stage, there are **no promises** of compatibility. In simple terms you should execute
 `bin/console generate --help` and configure it as you wish ;)
 
@@ -35,3 +45,5 @@ For more see [more detailed docs](docs/).
 ## Disclaimer
 This is a beta software. As with ROSv7 it's not recommended being used in production. This software nor the author are
 affiliated/supported/endorsed by [SIA Mikrotīkls](https://mikrotik.com/aboutus).
+
+

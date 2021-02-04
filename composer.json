@@ -2,7 +2,7 @@
     "require": {
         "php": "^7.4|^8.0",
         "ext-sodium": "*",
-        "evilfreelancer/routeros-api-php": "dev-support-php8",
+        "evilfreelancer/routeros-api-php": "^1.4",
         "endroid/qr-code": "^3.9",
         "symfony/console": "^5.1",
         "s1lentium/iptools": "^1.1",
@@ -42,9 +42,5 @@
         ]
     },
     "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/kiler129/routeros-api-php"
-        }
     ]
 }
